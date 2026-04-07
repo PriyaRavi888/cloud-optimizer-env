@@ -1,5 +1,8 @@
 name: cloud-optimizer-env
-
 description: Cloud optimization environment
+
+runtime:
+  type: docker
+  dockerfile: Dockerfile
 
 entrypoint: python inference.py
