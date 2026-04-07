@@ -1,9 +1,4 @@
 from fastapi import FastAPI
-import sys
-import os
-
-sys.path.append(os.path.abspath("."))
-
 from env.environment import CloudEnv
 
 app = FastAPI()
@@ -11,9 +6,17 @@ env = CloudEnv()
 
 @app.post("/reset")
 def reset():
-    state = env.reset()
-    return {"status": "ok", "state": state}
+    return {"state": env.reset()}
+
+@app.post("/step")
+def step(action: str):
+    state, reward, done, _ = env.step(action)
+    return {
+        "state": state,
+        "reward": reward,
+        "done": done
+    }
 
 @app.get("/")
-def root():
+def home():
     return {"message": "running"}
