@@ -1,7 +1,3 @@
-# -------------------------------
-# CLOUD OPTIMIZATION ENV LOGIC
-# -------------------------------
-
 class CloudOptimizerEnv:
     def __init__(self):
         self.step_count = 0
@@ -10,7 +6,6 @@ class CloudOptimizerEnv:
     def reset(self):
         self.step_count = 0
         self.rewards = []
-        return {"status": "reset"}
 
     def step(self, action="scale_up"):
         self.step_count += 1
@@ -27,25 +22,40 @@ class CloudOptimizerEnv:
 
         self.rewards.append(reward)
 
-        return {
-            "step": self.step_count,
-            "action": action,
-            "reward": reward,
-            "done": done
-        }
+        return reward, done
 
-    def run_episode(self):
-        self.reset()
-        results = []
 
-        while True:
-            res = self.step()
-            results.append(res)
-            if res["done"]:
-                break
+def main():
+    env = CloudOptimizerEnv()
 
-        return {
-            "success": False,
-            "steps": len(results),
-            "rewards": self.rewards
-        }
+    print("[START] task=cloud-optimization env=openenv model=rule-based-agent", flush=True)
+
+    env.reset()
+
+    rewards = []
+
+    for step in range(1, 11):
+        action = "scale_up"
+
+        reward, done = env.step(action)
+        rewards.append(reward)
+
+        print(
+            f"[STEP] step={step} action={action} reward={reward:.2f} done={str(done).lower()} error=null",
+            flush=True
+        )
+
+        if done:
+            break
+
+    success = False
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+
+    print(
+        f"[END] success={str(success).lower()} steps={len(rewards)} rewards={rewards_str}",
+        flush=True
+    )
+
+
+if __name__ == "__main__":
+    main()
