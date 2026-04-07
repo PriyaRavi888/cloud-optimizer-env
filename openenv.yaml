@@ -1,0 +1,13 @@
+id: cloud-optimizer-env
+
+description: Cloud resource optimization environment using rule-based agent
+
+entry_point: inference.py
+
+tags:
+  - cloud
+  - optimization
+  - rl
+  - environment
+
+version: 1.0.0
