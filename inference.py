@@ -32,22 +32,25 @@ def choose_action(state):
     traffic = state["traffic"]
     instances = state["instances"]
 
-    # 🔥 Balanced decision logic
+    # 🔥 Rule 1: Avoid over-scaling
+    if instances >= 5:
+        if cpu < 70:
+            return "scale_down"
 
-    # Overload → scale up
+    # 🔥 Rule 2: Handle overload
     if cpu > 85 or response > 450:
         return "scale_up"
 
-    # Underutilized → scale down
+    # 🔥 Rule 3: Reduce cost intelligently
+    if cost > 1400 and instances > 2:
+        return "scale_down"
+
+    # 🔥 Rule 4: Handle low usage
     if cpu < 50 and instances > 1:
         return "scale_down"
 
-    # Cost too high → reduce instances
-    if cost > 1500 and instances > 1:
-        return "scale_down"
-
-    # Traffic spike → scale up
-    if traffic > 400 and cpu > 70:
+    # 🔥 Rule 5: Traffic spike handling
+    if traffic > 400 and cpu > 75:
         return "scale_up"
 
     return "do_nothing"
