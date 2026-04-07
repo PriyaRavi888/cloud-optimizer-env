@@ -1,42 +1,51 @@
-import threading
-import time
-from http.server import BaseHTTPRequestHandler, HTTPServer
+# -------------------------------
+# CLOUD OPTIMIZATION ENV LOGIC
+# -------------------------------
 
-# Run your existing main() in background
-def run_env():
-    try:
-        main()
-    except Exception as e:
-        print(f"Error running env: {e}")
+class CloudOptimizerEnv:
+    def __init__(self):
+        self.step_count = 0
+        self.rewards = []
 
-threading.Thread(target=run_env).start()
+    def reset(self):
+        self.step_count = 0
+        self.rewards = []
+        return {"status": "reset"}
 
-# Simple server for Hugging Face
-class Handler(BaseHTTPRequestHandler):
+    def step(self, action="scale_up"):
+        self.step_count += 1
 
-    def do_GET(self):
-        if self.path == "/":
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Cloud Optimizer Env is running")
-        else:
-            self.send_response(404)
-            self.end_headers()
+        reward = -1.0
+        done = False
 
-    def do_POST(self):
-        if self.path == "/reset":
-            self.send_response(200)
-            self.send_header("Content-type", "application/json")
-            self.end_headers()
+        if self.step_count == 1:
+            reward = 0.0
+        if self.step_count == 3:
+            reward = -0.5
+        if self.step_count >= 10:
+            done = True
 
-            # minimal valid response
-            response = b'{"status": "reset successful"}'
-            self.wfile.write(response)
+        self.rewards.append(reward)
 
-        else:
-            self.send_response(404)
-            self.end_headers()
-server = HTTPServer(("0.0.0.0", 7860), Handler)
-print("Server running on port 7860...")
-server.serve_forever()
+        return {
+            "step": self.step_count,
+            "action": action,
+            "reward": reward,
+            "done": done
+        }
+
+    def run_episode(self):
+        self.reset()
+        results = []
+
+        while True:
+            res = self.step()
+            results.append(res)
+            if res["done"]:
+                break
+
+        return {
+            "success": False,
+            "steps": len(results),
+            "rewards": self.rewards
+        }
