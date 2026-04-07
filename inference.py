@@ -1,22 +1,22 @@
 import os
-from openai import OpenAI
+from litellm import completion
 
 # -------------------------------
 # LLM PROXY SETUP (REQUIRED)
 # -------------------------------
-client = OpenAI(
-    base_url=os.environ["API_BASE_URL"],
-    api_key=os.environ["API_KEY"]
-)
-
 def call_llm(prompt):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content
+    try:
+        response = completion(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            api_base=os.environ["API_BASE_URL"],
+            api_key=os.environ["API_KEY"]
+        )
+        return response["choices"][0]["message"]["content"]
+    except Exception as e:
+        return f"error: {str(e)}"
 
 
 # -------------------------------
@@ -58,7 +58,7 @@ def main():
     # START BLOCK
     print("[START] task=cloud-optimization env=openenv model=rule-based-agent", flush=True)
 
-    # 🔴 LLM CALL (REQUIRED FOR VALIDATION)
+    # 🔴 REQUIRED LLM CALL (USES PROXY)
     llm_response = call_llm("Suggest a cloud optimization strategy")
     print(f"[LLM] response={llm_response}", flush=True)
 
@@ -72,7 +72,7 @@ def main():
         reward, done = env.step(action)
         rewards.append(reward)
 
-        # STEP BLOCK (STRICT FORMAT)
+        # STEP BLOCK
         print(
             f"[STEP] step={step} action={action} reward={reward:.2f} done={str(done).lower()} error=null",
             flush=True
@@ -84,7 +84,7 @@ def main():
     success = False
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
-    # END BLOCK (STRICT FORMAT)
+    # END BLOCK
     print(
         f"[END] success={str(success).lower()} steps={len(rewards)} rewards={rewards_str}",
         flush=True
