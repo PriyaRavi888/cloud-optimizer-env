@@ -3,12 +3,18 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cloud-optimizer-env"
+name = "cloud_optimizer_env"
 version = "0.1.0"
 description = "OpenEnv RL environment"
 requires-python = ">=3.9"
-
 dependencies = []
 
 [tool.setuptools]
-py-modules = ["inference", "environment", "graders", "tasks", "app"]
+py-modules = [
+    "app",
+    "environment",
+    "graders",
+    "inference",
+    "tasks",
+    "test_env"
+]
