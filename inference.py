@@ -1,42 +1,28 @@
-from flask import Flask, request, jsonify
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-app = Flask(__name__)
+# Run your existing main() in background
+def run_env():
+    try:
+        main()
+    except Exception as e:
+        print(f"Error running env: {e}")
 
-@app.route("/")
-def home():
-    return "Cloud Optimizer ENV Running"
+threading.Thread(target=run_env).start()
 
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"})
+# Simple server for Hugging Face
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/":
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"Cloud Optimizer Env is running")
+        else:
+            self.send_response(404)
+            self.end_headers()
 
-@app.route("/reset", methods=["POST"])
-def reset():
-    return jsonify({
-        "message": "Environment reset successful",
-        "state": {"cpu": 50, "memory": 50}
-    })
-
-@app.route("/step", methods=["POST"])
-def step():
-    data = request.json
-    action = data.get("action", "do_nothing")
-
-    reward = 0
-    done = False
-
-    if action == "scale_up":
-        reward = -1
-    elif action == "scale_down":
-        reward = 1
-    elif action == "do_nothing":
-        reward = 0.5
-
-    return jsonify({
-        "reward": reward,
-        "done": done,
-        "state": {"cpu": 60, "memory": 40}
-    })
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7860)
+server = HTTPServer(("0.0.0.0", 7860), Handler)
+print("Server running on port 7860...")
+server.serve_forever()
