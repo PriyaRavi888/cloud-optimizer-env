@@ -5,7 +5,10 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cloud-optimizer-env"
 version = "0.1.0"
-description = "Cloud optimizer environment"
+description = "OpenEnv RL environment"
 requires-python = ">=3.9"
 
 dependencies = []
+
+[tool.setuptools]
+py-modules = ["inference", "environment", "graders", "tasks", "app"]
