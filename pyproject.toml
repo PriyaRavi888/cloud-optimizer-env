@@ -1,0 +1,10 @@
+[project]
+name = "cloud-optimizer-env"
+version = "0.1.0"
+description = "Cloud optimization environment"
+authors = [{name = "Priyadarshini"}]
+dependencies = []
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
